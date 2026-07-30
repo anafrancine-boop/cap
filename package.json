@@ -1,0 +1,32 @@
+{
+  "name": "capstone",
+  "version": "1.0.0",
+  "description": "Drainage Monitoring System with MongoDB Atlas",
+  "main": "server.js",
+
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+
+  "keywords": [
+    "drainage",
+    "iot",
+    "mongodb",
+    "express",
+    "monitoring"
+  ],
+
+  "author": "",
+  "license": "ISC",
+
+  "type": "commonjs",
+
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mongodb": "^6.18.0",
+    "socket.io": "^4.8.3"
+  }
+}

@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Drainage Clearing System</title>
+
+<link rel="stylesheet" href="publichomepage.css">
+
+</head>
+<body>
+
+<!-- <nav class="navbar">
+  <div class="logo">
+    Drainage Clearing System
+  </div>
+
+  
+  <a href="index.html" class="login-btn">
+    Admin Login
+  </a>
+</nav> -->
+
+<nav class="navbar">
+
+<div class="logo">
+Drainage Clearing System
+</div>
+
+<div class="nav-menu">
+
+<a href="#">Home</a>
+
+<a href="#live">
+Live Status
+</a>
+
+<a href="#about">
+About
+</a>
+
+<a href="#features">
+Features
+</a>
+
+</div>
+
+<a href="index.html" class="login-btn">
+Admin Login
+</a>
+
+</nav>
+
+
+<!-- <section class="hero">
+
+  <h1>
+    IoT-Based Automated Solar-Powered
+    Drainage Clearing System
+  </h1>
+
+  <p>
+    A smart drainage monitoring and debris-clearing solution designed
+    to help reduce flooding risks through real-time water level
+    monitoring, blockage detection, and automated cleaning mechanisms.
+  </p>
+
+  <div class="hero-actions">
+    <a href="#live" class="btn-primary">
+      View Live Status
+    </a>
+
+    <a href="#about" class="btn-outline">
+      Learn More
+    </a>
+  </div>
+
+  <div class="hero-status-strip">
+
+<div class="hero-chip">
+System Active
+</div>
+
+<div class="hero-chip">
+Live Monitoring
+</div>
+
+<div class="hero-chip">
+Solar Powered
+</div>
+
+<div class="hero-chip">
+Automatic Cleaning
+</div>
+
+</div>
+
+</section> -->
+
+<section class="hero">
+
+<div class="hero-content">
+
+<div class="hero-left">
+
+<div class="hero-badge">
+Smart Drainage Monitoring
+</div>
+
+<h1>
+IoT-Based Automated Solar-Powered
+Drainage Clearing System
+</h1>
+
+<p>
+A smart drainage monitoring and debris-clearing solution designed
+to reduce flooding risks through real-time water level monitoring,
+flow analysis, blockage detection, and automated clearing operations.
+</p>
+
+<div class="hero-actions">
+
+<a href="#live" class="btn-primary">
+View Live Status
+</a>
+
+<a href="#about" class="btn-outline">
+Learn More
+</a>
+
+<a href="index.html" class="btn-outline">
+View Dashboard
+</a>
+
+</div>
+
+<div class="hero-status-strip">
+
+<div class="hero-chip">ESP32 Powered</div>
+<div class="hero-chip">Solar Energy</div>
+<div class="hero-chip">Live Monitoring</div>
+<div class="hero-chip">Automated Clearing</div>
+
+</div>
+
+</div>
+
+<div class="hero-right">
+
+<div class="preview-card">
+
+<div class="preview-label">
+Water Level
+</div>
+
+<div class="preview-value" id="hero-water-level">
+--
+</div>
+
+</div>
+
+<div class="preview-card">
+
+<div class="preview-label">
+Flow Rate
+</div>
+
+<div class="preview-value" id="hero-flow-rate">
+--
+</div>
+
+</div>
+
+<div class="preview-card">
+
+<div class="preview-label">
+Drainage Status
+</div>
+
+<div class="preview-value">
+
+<span id="hero-status"
+class="badge badge-normal">
+Monitoring
+</span>
+
+</div>
+
+</div>
+
+<div class="preview-card">
+
+<div class="preview-label">
+System
+</div>
+
+<!-- <div class="preview-value">
+Online
+</div> -->
+<div class="preview-value" id="system-state">
+Online
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- <section class="section" id="live">
+
+  <div class="section-title">
+    <h2>Live Drainage Status</h2>
+    <p>Real-time data from the monitoring system</p>
+  </div>
+
+  <div class="live-status">
+
+    <div class="status-grid">
+
+      <div>
+        <div class="stat-label">Water Level</div>
+        <div class="status-value" id="water-level">
+          --
+        </div>
+      </div>
+
+      <div>
+        <div class="stat-label">Flow Rate</div>
+        <div class="status-value" id="flow-rate">
+          --
+        </div>
+      </div>
+
+      <div>
+        <div class="stat-label">Drainage Status</div>
+        <div class="status-value">
+          <span id="drainage-status"
+            class="badge badge-normal">
+            Monitoring
+          </span>
+        </div>
+      </div>
+
+      <div>
+        <div class="stat-label">Last Update</div>
+        <div id="last-update">
+          Waiting for data
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</section> -->
+
+<section class="section" id="live">
+
+<div class="section-title">
+
+<h2>Live Drainage Status</h2>
+
+<p>
+Real-time data from the monitoring system
+</p>
+
+</div>
+
+<div class="grid status-grid">
+
+  <div class="card">
+
+    <div class="stat-label">
+      Water Level
+    </div>
+
+    <div class="status-value" id="water-level">
+      --
+    </div>
+
+    <p>
+      Current measured water level inside the drainage channel.
+    </p>
+
+  </div>
+
+  <div class="card">
+
+    <div class="stat-label">
+      Flow Rate
+    </div>
+
+    <div class="status-value" id="flow-rate">
+      --
+    </div>
+
+    <p>
+      Estimated drainage flow based on sensor readings.
+    </p>
+
+  </div>
+
+  <div class="card">
+
+    <div class="stat-label">
+      Drainage Status
+    </div>
+
+    <div class="status-value">
+
+      <span
+      id="drainage-status"
+      class="badge badge-normal">
+
+      Monitoring
+
+      </span>
+
+    </div>
+
+    <p>
+      Current operational condition of the drainage system.
+    </p>
+
+  </div>
+
+  <div class="card">
+
+    <div class="stat-label">
+      Last Update
+    </div>
+
+    <div
+    id="last-update"
+    class="status-value">
+
+    --
+
+    </div>
+
+    <p>
+      Most recent reading received from the monitoring system.
+    </p>
+
+  </div>
+
+</div>
+
+</section>
+
+<section class="section">
+
+<div class="section-title">
+<h2>How the System Works</h2>
+
+<p>
+Simple steps showing how the drainage system helps reduce blockage.
+</p>
+
+</div>
+
+<div class="grid feature-grid">
+
+<div class="card">
+
+<h3>1. Monitor Water</h3>
+
+<p>
+The system watches water conditions continuously.
+</p>
+
+</div>
+
+<div class="card">
+
+<h3>2. Detect Problems</h3>
+
+<p>
+The system checks for unusual drainage conditions.
+</p>
+
+</div>
+
+<div class="card">
+
+<h3>3. Clean Automatically</h3>
+
+<p>
+If blockage is detected, the system starts cleaning.
+</p>
+
+</div>
+
+<div class="card">
+
+<h3>4. Send Updates</h3>
+
+<p>
+Current drainage conditions are shown in real time.
+</p>
+
+</div>
+
+</div>
+
+</section>
+
+<section class="section">
+
+  <div class="section-title">
+    <h2>Status Indicators</h2>
+  </div>
+
+  <div class="grid feature-grid">
+
+    <div class="card">
+      <h3>Normal</h3>
+      <p>
+        Water level and flow rate are within safe operating limits.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>High Water</h3>
+      <p>
+        Water level has reached the alert threshold.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Possible Blockage</h3>
+      <p>
+        Low flow rate indicates possible debris accumulation.
+      </p>
+    </div>
+
+  </div>
+
+</section>
+
+<section class="section">
+
+  <div class="section-title">
+    <h2>System Analytics</h2>
+
+<p>
+Historical monitoring events and generated alerts.
+</p>
+  </div>
+
+  <div class="grid stats-grid">
+
+    <div class="card">
+      <div class="stat-value" id="water-alerts">0</div>
+      <div class="stat-label">
+        Water Level Alerts
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stat-value" id="blockage-alerts">0</div>
+      <div class="stat-label">
+        Blockage Alerts
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stat-value" id="total-alerts">0</div>
+      <div class="stat-label">
+        Total Recorded Alerts
+      </div>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- <section class="section">
+
+<div class="section-title">
+
+<h2>Recent System Activity</h2>
+
+<p>
+Latest updates from the drainage monitoring system
+</p>
+
+</div>
+
+<div class="card">
+
+<div class="activity-item">
+System monitoring normally
+</div>
+
+<br>
+
+<div class="activity-item">
+Water data received successfully
+</div>
+
+<br>
+
+<div class="activity-item">
+No unusual drainage condition detected
+</div>
+
+</div>
+
+</section> -->
+
+<!-- <section class="section">
+
+<div class="section-title">
+
+<h2>System Overview</h2>
+
+<p>
+Core technologies and operational capabilities of the system.
+</p>
+
+</div>
+
+<div class="grid stats-grid">
+
+<div class="card">
+<div class="stat-value">24/7</div>
+<div class="stat-label">
+Monitoring
+</div>
+</div>
+
+<div class="card">
+<div class="stat-value">ESP32</div>
+<div class="stat-label">
+Controller
+</div>
+</div>
+
+<div class="card">
+<div class="stat-value">Solar</div>
+<div class="stat-label">
+Powered
+</div>
+</div>
+
+<div class="card">
+<div class="stat-value">Auto</div>
+<div class="stat-label">
+Clearing
+</div>
+</div>
+
+</div>
+
+</section> -->
+
+<section class="section" id="about">
+
+  <div class="section-title">
+    <h2>About The Project</h2>
+  </div>
+
+  <div class="card">
+
+<p>
+The Drainage Clearing System utilizes an ESP32 microcontroller,
+a waterproof ultrasonic sensor, solar-powered operation, and an
+automated blade-clearing mechanism to continuously monitor
+drainage conditions and detect potential blockage events.
+</p>
+
+<p>
+Real-time water level and flow rate data are transmitted to a
+web-based monitoring platform, allowing administrators to
+observe drainage conditions, receive alerts, and monitor
+system performance remotely.
+</p>
+
+<p>
+By combining automated monitoring and debris-clearing
+capabilities, the system helps reduce maintenance efforts
+while minimizing the risk of drainage-related flooding.
+</p>
+
+</div>
+
+</section>
+
+<!-- <section class="section" id="benefits">
+
+<div class="section-title">
+
+<h2>Benefits to the Community</h2>
+
+<p>
+How this project helps reduce drainage problems
+</p>
+
+</div>
+
+<div class="grid benefits-grid">
+
+<div class="card">
+
+<h3>Flood Prevention</h3>
+
+<p>
+Helps reduce drainage blockage before flooding occurs.
+</p>
+
+</div>
+
+<div class="card">
+
+<h3>Safer Environment</h3>
+
+<p>
+Keeps drainage pathways cleaner and flowing properly.
+</p>
+
+</div>
+
+<div class="card">
+
+<h3>Less Manual Work</h3>
+
+<p>
+Reduces the need for frequent manual cleaning.
+</p>
+
+</div>
+
+</div>
+
+</section> -->
+
+<!-- <section class="section"> -->
+    <section class="section" id="features">
+
+  <div class="section-title">
+    <h2>Key Features</h2>
+  </div>
+
+  <div class="grid feature-grid">
+
+    <div class="card feature-card">
+      <h3>Real-Time Monitoring</h3>
+      <p>
+        Continuous monitoring of water level and flow rate.
+      </p>
+    </div>
+
+    <div class="card feature-card">
+      <h3>Automatic Detection</h3>
+      <p>
+        Detects possible blockage through low-flow analysis.
+      </p>
+    </div>
+
+    <div class="card feature-card">
+      <h3>Automated Clearing</h3>
+      <p>
+        Activates blade mechanism when blockage is detected.
+      </p>
+    </div>
+
+    <div class="card feature-card">
+      <h3>Solar Powered</h3>
+      <p>
+        Renewable energy source for continuous operation.
+      </p>
+    </div>
+
+  </div>
+
+</section>
+
+<footer class="footer">
+
+  <h3>
+    Drainage Clearing System
+  </h3>
+
+  <p>
+    Capstone Project 2025
+  </p>
+
+  <p>
+    Purok 2, Balungao, Calumpit, Bulacan
+  </p>
+
+</footer>
+
+<script>
+
+async function loadStatus() {
+
+  try {
+
+    const statusRes =
+      await fetch('/api/status');
+
+    const alertsRes =
+      await fetch('/api/alerts?limit=100');
+
+    const statusData =
+      await statusRes.json();
+
+    const alerts =
+      await alertsRes.json();
+
+    const latest =
+  statusData.latest || {};
+
+const systemState =
+  document.getElementById(
+    'system-state'
+  );
+
+if (latest.recorded_at) {
+
+  const age =
+    Date.now() -
+    new Date(
+      latest.recorded_at
+    ).getTime();
+
+  if (age < 60000) {
+
+  systemState.textContent =
+    'Online';
+
+  systemState.className =
+    'preview-value system-online';
+
+} else {
+
+  systemState.textContent =
+    'Offline';
+
+  systemState.className =
+    'preview-value system-offline';
+
+}
+
+} else {
+
+  systemState.textContent =
+    'Offline';
+
+}
+    document.getElementById(
+  'water-level'
+).textContent =
+  `${Number(
+    latest.water_level_cm || 0
+  ).toFixed(1)} cm`;
+
+document.getElementById(
+  'flow-rate'
+).textContent =
+  `${Number(
+    latest.flow_rate_ls || 0
+  ).toFixed(2)} L/s`;
+
+/* HERO PREVIEW CARDS */
+
+document.getElementById(
+  'hero-water-level'
+).textContent =
+  `${Number(
+    latest.water_level_cm || 0
+  ).toFixed(1)} cm`;
+
+document.getElementById(
+  'hero-flow-rate'
+).textContent =
+  `${Number(
+    latest.flow_rate_ls || 0
+  ).toFixed(2)} L/s`;
+const badge =
+  document.getElementById(
+    'drainage-status'
+  );
+
+const heroBadge =
+  document.getElementById(
+    'hero-status'
+  );
+
+if (statusData.status?.lowFlow) {
+
+  badge.textContent =
+    'Possible Blockage';
+
+  badge.className =
+    'badge badge-danger';
+
+  heroBadge.textContent =
+    'Possible Blockage';
+
+  heroBadge.className =
+    'badge badge-danger';
+
+} else if (
+  statusData.status?.highWater
+) {
+
+  badge.textContent =
+    'High Water';
+
+  badge.className =
+    'badge badge-warning';
+
+  heroBadge.textContent =
+    'High Water';
+
+  heroBadge.className =
+    'badge badge-warning';
+
+} else {
+
+  badge.textContent =
+    'Normal';
+
+  badge.className =
+    'badge badge-normal';
+
+  heroBadge.textContent =
+    'Normal';
+
+  heroBadge.className =
+    'badge badge-normal';
+
+}
+
+    document.getElementById(
+      'last-update'
+    ).textContent =
+      latest.recorded_at
+        ? new Date(
+            latest.recorded_at
+          ).toLocaleString()
+        : 'No reading';
+
+    const waterAlerts =
+      alerts.filter(
+        a =>
+          a.alert_type ===
+          'HIGH_WATER_LEVEL'
+      ).length;
+
+    const blockageAlerts =
+      alerts.filter(
+        a =>
+          a.alert_type ===
+          'LOW_FLOW_RATE'
+      ).length;
+
+    document.getElementById(
+      'water-alerts'
+    ).textContent =
+      waterAlerts;
+
+    document.getElementById(
+      'blockage-alerts'
+    ).textContent =
+      blockageAlerts;
+
+    document.getElementById(
+      'total-alerts'
+    ).textContent =
+      alerts.length;
+
+  } catch (err) {
+
+    console.error(err);
+
+  }
+
+}
+
+loadStatus();
+
+setInterval(
+  loadStatus,
+  5000
+);
+
+</script>
+
+</body>
+</html>

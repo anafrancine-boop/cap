@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drainage Details - Drainage Clearing System</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">D</div>
+    <div class="brand-copy">
+      <span class="brand-name">Drainage Clearing System</span>
+      <span class="brand-subtitle">IoT Monitoring Platform</span>
+    </div>
+  </div>
+  <p class="sidebar-section-label">Monitoring</p>
+  <nav class="sidebar-nav">
+    <a href="home.html" class="nav-link"><span class="nav-icon">01</span><span class="nav-text">Dashboard</span></a>
+    <a href="drainage.html" class="nav-link active"><span class="nav-icon">02</span><span class="nav-text">Drainage Details</span></a>
+    <a href="alerts.html" class="nav-link"><span class="nav-icon">03</span><span class="nav-text">Alert Log</span></a>
+    <a href="analytics.html" class="nav-link"><span class="nav-icon">04</span><span class="nav-text">Analytics</span></a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="system-card"><span>Deployment</span><strong>Purok 2, Balungao, Calumpit, Bulacan</strong></div>
+    <button class="logout-btn" id="logout-btn" type="button">Logout</button>
+  </div>
+</aside>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <button class="hamburger-btn" id="sidebar-toggle" type="button" aria-label="Toggle navigation"><span class="hamburger-lines"></span></button>
+    <span class="breadcrumb-item">Purok 2 > Balungao > Calumpit, Bulacan</span>
+  </div>
+  <div class="topbar-right">
+    <div class="live-indicator" id="connection-state"><span class="live-dot"></span> LIVE</div>
+    <div class="clock-card"><span class="clock-label">Philippine Time</span><span class="topbar-clock" id="clock">--:--:--</span></div>
+  </div>
+</div>
+
+<main class="main-wrapper">
+  <div class="main-content">
+    <div class="page-header-row">
+      <div class="page-header">
+        <h1 class="page-title">Drainage details</h1>
+        <p class="page-subtitle">Condition, threshold logic, and prototype operation status</p>
+      </div>
+      <div class="status-pill" id="last-seen">Waiting for reading</div>
+    </div>
+
+    <section class="details-section">
+      <div class="details-section-title">Drainage condition and system operation</div>
+      <div class="status-row status-ok" id="drainage-status-row">
+        <span class="status-dot dot-green" id="drainage-dot"></span>
+        <span id="drainage-status-text">Drainage is not clogged - water level is below threshold</span>
+      </div>
+      <div class="status-row status-inactive" id="system-status-row">
+        <span class="status-dot dot-muted" id="system-dot"></span>
+        <span id="system-status-text">Blade mechanism is on standby</span>
+      </div>
+    </section>
+
+    <section class="content-grid">
+      <article class="details-section">
+        <div class="details-section-title">Current readings</div>
+        <table class="readings-table">
+          <tbody>
+            <tr><td>Water level threshold</td><td id="threshold-water">5.0 cm</td></tr>
+            <tr><td>Current water level</td><td class="reading-normal" id="read-water-level">-- cm</td></tr>
+            <tr><td>System in operation</td><td class="reading-inactive" id="read-sys-op">No</td></tr>
+          </tbody>
+        </table>
+      </article>
+
+      <article class="details-section">
+        <div class="details-section-title">Threshold progress</div>
+        <div class="progress-wrapper">
+          <div class="progress-label">Water level against alert threshold</div>
+          <div class="progress-bar"><div class="progress-fill" id="water-progress"></div></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="content-grid">
+      <article class="details-section">
+        <div class="details-section-title">Prototype components</div>
+        <table class="readings-table">
+          <tbody>
+            <tr><td>ESP32 controller</td><td class="reading-normal" id="esp-status">Online</td></tr>
+            <tr><td>JSN-SR04T waterproof ultrasonic sensor</td><td class="reading-normal" id="sensor-status">Receiving data</td></tr>
+            <tr><td>Rotating blade mechanism</td><td id="blade-detail">Standby</td></tr>
+            <!-- <tr><td>Solar-powered battery system</td><td class="reading-normal">Configured</td></tr> -->
+             <tr>
+<td>Solar-powered battery system</td>
+
+<td
+class="reading-normal"
+id="solar-status">
+
+Charging
+(85%)
+
+</td>
+
+</tr>
+          </tbody>
+        </table>
+      </article>
+
+      <!-- <article class="details-section">
+        <div class="details-section-title">Safety and scope guide</div>
+        <div class="status-row status-inactive"><span class="status-dot dot-muted"></span><span>Warning lights and buzzer should run before blade operation.</span></div>
+        <div class="status-row status-inactive"><span class="status-dot dot-muted"></span><span>Designed for soft debris such as plastic bags, leaves, sludge, and similar waste.</span></div>
+        <div class="status-row status-inactive"><span class="status-dot dot-muted"></span><span>Best suited for proportionally straight drainage channels.</span></div>
+      </article> -->
+    </section>
+  </div>
+</main>
+
+<script>
+function formatAgo(value) {
+  if (!value) return 'No sensor reading received';
+  const seconds = Math.round(Math.max(0, Date.now() - new Date(value).getTime()) / 1000);
+  if (seconds < 60) return `Last reading ${seconds}s ago`;
+  const minutes = Math.round(seconds / 60);
+  return minutes < 60 ? `Last reading ${minutes}m ago` : `Last reading ${Math.round(minutes / 60)}h ago`;
+}
+
+function setProgress(id, percent) {
+  document.getElementById(id).style.width = `${Math.max(0, Math.min(100, percent))}%`;
+}
+
+function updateUI(payload) {
+  const latest = payload.latest || {};
+  const status = payload.status || {};
+  const thresholds = payload.thresholds || { water_level_cm: 5, flow_rate_ls: 0.6 };
+  const waterLevel = Number(status.waterLevel || latest.water_level_cm || 0);
+  const flowRate = Number(status.flowRate || latest.flow_rate_ls || 0);
+  const isClogged = !!status.lowFlow;
+  const isHighWater = !!status.highWater;
+  const isOperating = !!status.bladeActive;
+
+  document.getElementById('last-seen').textContent = formatAgo(payload.last_seen);
+  document.getElementById('threshold-water').textContent = `${Number(thresholds.water_level_cm).toFixed(1)} cm`;
+  document.getElementById('read-water-level').textContent = latest._id ? `${waterLevel.toFixed(1)} cm` : '-- cm';
+  document.getElementById('read-flow-rate').textContent = latest._id ? `${flowRate.toFixed(2)} L/s` : '-- L/s';
+  document.getElementById('read-water-level').className = isHighWater ? 'reading-warning' : 'reading-normal';
+  document.getElementById('read-flow-rate').className = isClogged ? 'reading-danger' : 'reading-normal';
+  document.getElementById('read-drain-status').textContent = isClogged ? 'Clogged' : isHighWater ? 'High water' : 'Not clogged';
+  document.getElementById('read-drain-status').className = isClogged ? 'reading-danger' : isHighWater ? 'reading-warning' : 'reading-normal';
+  document.getElementById('read-sys-op').textContent = isOperating ? 'Yes' : 'No';
+  document.getElementById('read-sys-op').className = isOperating ? 'reading-danger' : 'reading-inactive';
+  document.getElementById('blade-detail').textContent = isOperating ? 'Active - clearing debris' : 'Standby';
+  document.getElementById('blade-detail').className = isOperating ? 'reading-danger' : 'reading-inactive';
+
+  document.getElementById('drainage-status-row').className = `status-row ${isClogged ? 'status-warning' : isHighWater ? 'status-caution' : 'status-ok'}`;
+  document.getElementById('drainage-dot').className = `status-dot ${isClogged ? 'dot-orange' : isHighWater ? 'dot-yellow' : 'dot-green'}`;
+  document.getElementById('drainage-status-text').textContent = isClogged
+    ? 'Drainage may be clogged - flow rate is below the normal threshold'
+    : isHighWater
+      ? 'Water level is high - alert sent while blade remains on standby'
+      : 'Drainage is not clogged - water flow is efficient';
+
+  document.getElementById('system-status-row').className = `status-row ${isOperating ? 'status-warning' : 'status-inactive'}`;
+  document.getElementById('system-dot').className = `status-dot ${isOperating ? 'dot-orange' : 'dot-muted'}`;
+  document.getElementById('system-status-text').textContent = isOperating
+    ? 'Blade mechanism is in operation because low flow indicates blockage'
+    : 'Blade mechanism is on standby - no confirmed low-flow blockage';
+
+  const solar =
+payload.solar
+||
+{
+battery:85,
+status:"Charging"
+};
+
+document.getElementById(
+"solar-status"
+).textContent =
+
+`${solar.status}
+(${solar.battery}%)`;
+
+  setProgress('water-progress', (waterLevel / Number(thresholds.water_level_cm)) * 100);
+  setProgress('flow-progress', Math.max(0, 100 - (flowRate / Number(thresholds.flow_rate_ls)) * 100));
+}
+
+async function loadLatest() {
+  try {
+    const res = await fetch('/api/status');
+    if (!res.ok) throw new Error('API unavailable');
+    updateUI(await res.json());
+    document.getElementById('connection-state').classList.remove('offline');
+    document.getElementById('connection-state').innerHTML = '<span class="live-dot"></span> LIVE';
+  } catch (error) {
+    document.getElementById('connection-state').classList.add('offline');
+    document.getElementById('connection-state').innerHTML = '<span class="live-dot"></span> OFFLINE';
+    document.getElementById('esp-status').textContent = 'Offline';
+    document.getElementById('esp-status').className = 'reading-danger';
+    document.getElementById('sensor-status').textContent = 'No data';
+    document.getElementById('sensor-status').className = 'reading-danger';
+    document.getElementById(
+'solar-status'
+).textContent =
+'Offline';
+  }
+}
+
+loadLatest();
+setInterval(loadLatest, 5000);
+</script>
+</body>
+</html>

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Drainage Clearing System</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">D</div>
+      <div class="brand-copy">
+        <span class="brand-name">Drainage Clearing System</span>
+        <span class="brand-subtitle">IoT Monitoring Platform</span>
+      </div>
+    </div>
+    <p class="sidebar-section-label">Monitoring</p>
+    <nav class="sidebar-nav">
+      <a href="home.html" class="nav-link active"><span class="nav-icon">01</span><span
+          class="nav-text">Dashboard</span></a>
+      <a href="drainage.html" class="nav-link"><span class="nav-icon">02</span><span class="nav-text">Drainage
+          Details</span></a>
+      <a href="alerts.html" class="nav-link"><span class="nav-icon">03</span><span class="nav-text">Alert Log</span></a>
+      <a href="analytics.html" class="nav-link"><span class="nav-icon">04</span><span
+          class="nav-text">Analytics</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="system-card">
+        <span>Deployment</span>
+        <strong>Purok 2, Balungao, Calumpit, Bulacan</strong>
+      </div>
+      <button class="logout-btn" id="logout-btn" type="button">Logout</button>
+    </div>
+  </aside>
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger-btn" id="sidebar-toggle" type="button" aria-label="Toggle navigation">
+        <span class="hamburger-lines"></span>
+      </button>
+      <span class="breadcrumb-item">Purok 2 > Balungao > Calumpit, Bulacan</span>
+    </div>
+    <div class="topbar-right">
+      <div class="live-indicator" id="connection-state"><span class="live-dot"></span> LIVE</div>
+      <div class="clock-card">
+        <span class="clock-label">Philippine Time</span>
+        <span class="topbar-clock" id="clock">--:--:--</span>
+      </div>
+    </div>
+  </div>
+
+  <main class="main-wrapper">
+    <div class="main-content">
+      <section class="media-hero">
+        <div class="hero-content">
+          <div class="eyebrow">Purok 2, Balungao, Calumpit, Bulacan</div>
+          <h1>IoT-based automated solar-powered drainage clearing system</h1>
+          <p>Track water level, and blade operation.</p>
+          <div class="hero-actions">
+            <a class="hero-chip" href="drainage.html">View live drainage</a>
+            <a class="hero-chip" href="alerts.html">Review alerts</a>
+          </div>
+        </div>
+        <div class="hero-image-note">
+  <img
+    src="assets/drainage-system.jpg"
+    alt="Drainage Clearing System"
+    class="hero-image"
+  >
+</div>
+      </section>
+
+      <div class="page-header-row">
+        <div class="page-header">
+          <h1 class="page-title">Operations dashboard</h1>
+          <p class="page-subtitle">Real-time drainage condition, blade status, and maintenance alerts</p>
+        </div>
+        <div class="status-pill" id="last-seen">Waiting for sensor data</div>
+      </div>
+
+      <section class="hero-status" id="hero-status">
+        <div>
+          <div class="eyebrow">Current condition</div>
+          <h2 id="condition-title">No reading yet</h2>
+          <p id="condition-copy">The monitoring platform is ready to receive ESP32 sensor data.</p>
+        </div>
+        <div class="hero-action" id="action-label">Monitoring</div>
+      </section>
+
+      <section class="live-grid">
+        <article class="live-card">
+          <div class="live-card-title">Water Level</div>
+          <div class="live-card-value" id="water-level-live">-- cm</div>
+          <div class="live-card-sub">Alert threshold: <span id="wl-threshold">5.0</span> cm</div>
+          <div class="meter"><span id="water-meter"></span></div>
+        </article>
+        <article class="live-card">
+          <div class="live-card-title">Drainage Status</div>
+          <div class="live-card-value status-normal" id="drain-status-live">Normal</div>
+          <div class="live-card-sub">Based on flow efficiency</div>
+        </article>
+        <article class="live-card">
+          <div class="live-card-title">Blade Mechanism</div>
+          <div class="live-card-value status-normal" id="blade-status-live">Standby</div>
+          <div class="live-card-sub">Activates only when low flow confirms blockage</div>
+        </article>
+        <article class="live-card">
+          <div class="live-card-title">Solar Power</div>
+
+          <div class="live-card-value status-normal" id="solar-status"> Charging</div>
+
+          <div class="live-card-sub">
+
+            Battery:
+            <span id="solar-battery">
+
+              --%
+
+            </span>
+
+          </div>
+
+        </article>
+      </section>
+
+      <section class="stat-cards">
+        <article class="stat-card">
+          <div class="stat-label">High Water Alerts</div>
+          <div class="stat-value orange" id="stat-wl">0</div>
+          <p class="stat-note">Last 24 hours</p>
+        </article>
+        <article class="stat-card">
+          <div class="stat-label">Blade Activations</div>
+          <div class="stat-value teal" id="stat-blade">0</div>
+          <p class="stat-note">Last 24 hours</p>
+        </article>
+      </section>
+
+      <section class="content-grid">
+        <article class="details-section">
+          <div class="details-section-title">Recent alerts</div>
+          <div class="notif-panel compact" id="notif-panel">
+            <div class="empty-state">No alerts loaded yet.</div>
+          </div>
+        </article>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    
+    const API_STATUS = '/api/status';
+    const API_ALERTS = '/api/alerts?limit=5';
+
+    function formatAgo(value) {
+      if (!value) return 'No sensor reading received';
+      const diff = Math.max(0, Date.now() - new Date(value).getTime());
+      const seconds = Math.round(diff / 1000);
+      if (seconds < 60) return `Last reading ${seconds}s ago`;
+      const minutes = Math.round(seconds / 60);
+      if (minutes < 60) return `Last reading ${minutes}m ago`;
+      return `Last reading ${Math.round(minutes / 60)}h ago`;
+    }
+
+    function setMeter(id, value, max, invert = false) {
+      const pct = Math.max(0, Math.min(100, (value / max) * 100));
+      document.getElementById(id).style.width = `${invert ? 100 - pct : pct}%`;
+    }
+
+    function renderStatus(payload) {
+      const latest = payload.latest || {};
+      const status = payload.status || {};
+      const thresholds = payload.thresholds || { water_level_cm: 5, flow_rate_ls: 0.6 };
+      const water = Number(status.waterLevel || latest.water_level_cm || 0);
+      const flow = Number(status.flowRate || latest.flow_rate_ls || 0);
+      const solar =
+        payload.solar
+        ||
+        {
+          battery: 85,
+          status: "Charging"
+        };
+
+      document.getElementById(
+        "solar-status"
+      ).textContent =
+        solar.status;
+
+      document.getElementById(
+        "solar-battery"
+      ).textContent =
+        `${solar.battery}%`;
+
+      document.getElementById('wl-threshold').textContent = Number(thresholds.water_level_cm).toFixed(1);
+      document.getElementById('fr-threshold').textContent = Number(thresholds.flow_rate_ls).toFixed(2);
+      document.getElementById(
+        'water-level-live'
+      ).textContent =
+
+        latest._id
+          ?
+
+          `${water.toFixed(1)} cm`
+
+          :
+
+          '-- cm';
+      document.getElementById(
+        'flow-rate-live'
+      ).textContent =
+
+        latest._id
+          ?
+
+          `${flow.toFixed(2)} L/s`
+
+          :
+
+          '-- L/s'; document.getElementById('drain-status-live').textContent = status.statusLabel || 'Normal';
+      document.getElementById('blade-status-live').textContent = status.bladeActive ? 'Active' : 'Standby';
+      document.getElementById('last-seen').textContent = formatAgo(payload.last_seen);
+      document.getElementById('stat-wl').textContent = payload.alerts_24h?.high_water ?? 0;
+      document.getElementById('stat-bl').textContent = payload.alerts_24h?.low_flow ?? 0;
+      document.getElementById('stat-blade').textContent = payload.blade_activations_24h ?? 0;
+
+      document.getElementById('hero-status').className = `hero-status ${status.severity || 'normal'}`;
+      document.getElementById('condition-title').textContent = status.statusLabel || 'Normal';
+      document.getElementById('action-label').textContent = status.actionLabel || 'Monitoring';
+      document.getElementById('condition-copy').textContent = status.lowFlow
+        ? 'Low flow indicates possible blockage. The clearing blade is active to break down soft debris.'
+        : status.highWater
+          ? 'Water depth reached the alert threshold. Maintenance personnel should monitor the channel.'
+          : 'Water depth and flow rate are within normal operating range.';
+
+      document.getElementById('drain-status-live').className =
+        `live-card-value ${status.lowFlow ? 'status-danger' : status.highWater ? 'reading-warning' : 'status-normal'}`;
+      document.getElementById('blade-status-live').className =
+        `live-card-value ${status.bladeActive ? 'status-danger' : 'status-normal'}`;
+
+      document.getElementById('logic-water').className = `status-row ${status.highWater ? 'status-warning' : 'status-inactive'}`;
+      document.getElementById('logic-flow').className = `status-row ${status.lowFlow ? 'status-warning' : 'status-inactive'}`;
+
+      setMeter('water-meter', water, thresholds.water_level_cm * 1.4);
+      setMeter('flow-meter', flow, thresholds.flow_rate_ls * 2, true);
+    }
+
+    function alertCard(alert) {
+      const isBlockage = alert.alert_type === 'LOW_FLOW_RATE';
+      const isSystem = alert.alert_type === 'SYSTEM_EVENT';
+      const time = new Date(alert.triggered_at).toLocaleString('en-PH', {
+        timeZone: 'Asia/Manila',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      });
+      const badge = isSystem ? 'System' : isBlockage ? 'Blockage' : 'Water level';
+      const text = isSystem
+        ? 'Monitoring service started.'
+        : isBlockage
+          ? `Flow ${Number(alert.flow_rate_ls || 0).toFixed(2)} L/s. Blade activated.`
+          : `Water level ${Number(alert.water_level_cm || 0).toFixed(1)} cm. Alert sent.`;
+      return `<div class="notif-card ${isBlockage ? 'alert-red' : isSystem ? 'alert-teal' : 'alert-orange'}">
+    <div class="notif-header"><span class="notif-badge ${isBlockage ? 'red' : isSystem ? 'teal' : 'orange'}">${badge}</span><span class="notif-time">${time}</span></div>
+    <div class="notif-title">${alert.drainage_location || 'Purok 2 drainage'}</div>
+    <div class="notif-desc">${text}</div>
+  </div>`;
+    }
+
+    async function loadDashboard() {
+      try {
+        const [statusRes, alertsRes] = await Promise.all([fetch(API_STATUS), fetch(API_ALERTS)]);
+        if (!statusRes.ok || !alertsRes.ok) throw new Error('API unavailable');
+        renderStatus(await statusRes.json());
+        const alerts = await alertsRes.json();
+        document.getElementById('notif-panel').innerHTML = alerts.length
+          ? alerts.map(alertCard).join('')
+          : '<div class="empty-state">No alerts recorded yet.</div>';
+        document.getElementById('connection-state').classList.remove('offline');
+        document.getElementById('connection-state').innerHTML = '<span class="live-dot"></span> LIVE';
+      } catch (error) {
+        document.getElementById('connection-state').classList.add('offline');
+        document.getElementById('connection-state').innerHTML = '<span class="live-dot"></span> OFFLINE';
+      }
+    }
+
+    loadDashboard();
+    setInterval(loadDashboard, 5000);
+  </script>
+  
+</body>
+
+</html>

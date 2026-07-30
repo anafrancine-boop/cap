@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Drainage Clearing System</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body class="login-body">
+  <main class="login-card">
+    <section class="login-visual">
+      <div>
+        <div class="brand-icon">D</div>
+      </div>
+      <div>
+        <div class="eyebrow">Purok 2 monitoring access</div>
+        <h1>Drainage Monitoring System</h1>
+        <p>Monitors water level, flow rate, alerts, and blade activation.</p>
+      </div>
+    </section>
+
+    <section class="login-panel">
+        <a href="publichomepage.html" class="back-btn">
+    ← Back to Home
+  </a>
+      <h2>Welcome back</h2>
+      <p>Sign in to access the drainage monitoring dashboard.</p>
+
+      <form class="login-form" id="login-form">
+        <label>
+          Username
+          <input id="username" name="username" type="text" autocomplete="username" required>
+        </label>
+        <label>
+          Password
+          <input id="password" name="password" type="password" autocomplete="current-password" required>
+        </label>
+        <button class="primary-btn" type="submit">Sign in</button>
+        <div class="empty-state hidden" id="login-error"></div>
+      </form>
+
+      <!-- <div class="login-hint">
+        Demo access: username <strong>admin</strong>, password <strong>admin123</strong>.
+      </div>
+       -->
+
+    <div class="login-hint">
+  Demo access: username <strong>admin</strong>, password <strong>admin123</strong>.
+</div>
+
+<!-- <div class="login-actions">
+  <a href="publichomepage.html" class="secondary-btn">
+    ← Back to Public Homepage
+  </a>
+</div> -->
+    </section>
+  </main>
+</body>
+</html>

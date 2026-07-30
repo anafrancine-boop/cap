@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics - Drainage Clearing System</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="app.js" defer></script>
+</head>
+
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">D</div>
+      <div class="brand-copy">
+        <span class="brand-name">Drainage Clearing System</span>
+        <span class="brand-subtitle">IoT Monitoring Platform</span>
+      </div>
+    </div>
+    <p class="sidebar-section-label">Monitoring</p>
+    <nav class="sidebar-nav">
+      <a href="home.html" class="nav-link"><span class="nav-icon">01</span><span class="nav-text">Dashboard</span></a>
+      <a href="drainage.html" class="nav-link"><span class="nav-icon">02</span><span class="nav-text">Drainage
+          Details</span></a>
+      <a href="alerts.html" class="nav-link"><span class="nav-icon">03</span><span class="nav-text">Alert Log</span></a>
+      <a href="analytics.html" class="nav-link active"><span class="nav-icon">04</span><span
+          class="nav-text">Analytics</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="system-card"><span>Deployment</span><strong>Purok 2, Balungao, Calumpit, Bulacan</strong></div>
+      <button class="logout-btn" id="logout-btn" type="button">Logout</button>
+    </div>
+  </aside>
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger-btn" id="sidebar-toggle" type="button" aria-label="Toggle navigation"><span
+          class="hamburger-lines"></span></button>
+      <span class="breadcrumb-item">Purok 2 > Balungao > Calumpit, Bulacan</span>
+    </div>
+    <div class="topbar-right">
+      <div class="live-indicator" id="connection-state"><span class="live-dot"></span> LIVE</div>
+      <div class="clock-card"><span class="clock-label">Philippine Time</span><span class="topbar-clock"
+          id="clock">--:--:--</span></div>
+    </div>
+  </div>
+
+  <main class="main-wrapper">
+    <div class="main-content">
+      <div class="page-header-row">
+        <div class="page-header">
+          <h1 class="page-title">Analytics</h1>
+          <p class="page-subtitle">Historical alert distribution and maintenance planning indicators</p>
+        </div>
+        <div class="month-filters" id="month-filters">
+          <span>Month:</span>
+        </div>
+      </div>
+
+      <section class="stat-cards">
+        <article class="stat-card">
+          <div class="stat-label">Water Level Alerts</div>
+          <div class="stat-value orange" id="stat-wl">0</div>
+          <p class="stat-note">Alert-only threshold events</p>
+        </article>
+        <article class="stat-card">
+          <div class="stat-label">Blade Activations</div>
+          <div class="stat-value teal" id="stat-blade">0</div>
+          <p class="stat-note">Recorded clearing operations</p>
+        </article>
+      </section>
+
+      <section class="charts-grid">
+        <article class="chart-card">
+          <div class="chart-title">Water level alerts by week</div>
+          <div class="chart-subtitle">Occurrences where water depth reached the 5 cm threshold</div>
+          <div class="chart-container"><canvas id="chartWaterLevel"></canvas></div>
+        </article>
+      </section>
+
+      <section class="content-grid">
+        <article class="summary-card">
+          <div class="summary-title">Monthly summary</div>
+          <div class="summary-row"><span>Water level alerts</span><span class="summary-badge badge-orange" id="sum-wl">0
+              ALERTS</span></div>
+          <div class="summary-row"><span>System events</span><span class="summary-badge badge-teal" id="sum-sys">0
+              EVENTS</span></div>
+          <div class="summary-row"><span>Blade activations</span><span class="summary-badge badge-green"
+              id="sum-blade">0 RUNS</span></div>
+        </article>
+        <article class="summary-card">
+          <div class="summary-title">Sensor averages</div>
+          <div class="summary-row"><span>Average water level</span><span class="summary-badge badge-orange"
+              id="avg-water">0.0 CM</span></div>
+          <p class="summary-note">Use these values to discuss functional testing, consistency, and recurring drainage
+            conditions.</p>
+        </article>
+      </section>
+                    <button class="filter-btn export-btn2" id="export-btn2">Export CSV</button>
+    </div>
+  </main>
+
+  <script>
+    Chart.defaults.color = '#657682';
+    Chart.defaults.font.family = "'Inter', sans-serif";
+    const WEEK_LABELS = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+    let chartWL;
+    let chartBL;
+
+    function buildMonthFilters() {
+      const wrap = document.getElementById('month-filters');
+      const now = new Date();
+      for (let i = 2; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const label = d.toLocaleString('en-US', { month: 'short' });
+        const btn = document.createElement('button');
+        btn.className = `month-btn ${i === 0 ? 'active' : ''}`;
+        btn.textContent = label;
+        btn.dataset.month = label;
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.month-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          loadAnalytics(label);
+        });
+        wrap.appendChild(btn);
+      }
+    }
+
+    function makeChart(canvasId, data, colors) {
+      return new Chart(document.getElementById(canvasId).getContext('2d'), {
+        type: 'bar',
+        data: { labels: WEEK_LABELS, datasets: [{ data, backgroundColor: colors, borderRadius: 8, borderSkipped: false }] },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y} alerts` } }
+          },
+          scales: {
+            x: { grid: { display: false } },
+            y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: 'rgba(16,32,42,0.08)' } }
+          }
+        }
+      });
+    }
+
+    function updateCharts(wlData, blData) {
+      if (chartWL) chartWL.destroy();
+      if (chartBL) chartBL.destroy();
+      chartWL = makeChart('chartWaterLevel', wlData, ['#d97706', '#e69a35', '#efb15e', '#f5c987']);
+      chartBL = makeChart('chartBlockage', blData, ['#dc2626', '#e45757', '#eb7d7d', '#f2aaaa']);
+    }
+
+    function renderAnalytics(data) {
+      const wl = Number(data.waterLevelCount || 0);
+      const bl = Number(data.blockageCount || 0);
+      const sys = Number(data.systemEvents || 0);
+      const blade = Number(data.bladeActivations || 0);
+      document.getElementById('stat-wl').textContent = wl;
+      document.getElementById('stat-bl').textContent = bl;
+      document.getElementById('stat-blade').textContent = blade;
+      document.getElementById('sum-wl').textContent = `${wl} ALERTS`;
+      document.getElementById('sum-bl').textContent = `${bl} ALERTS`;
+      document.getElementById('sum-sys').textContent = `${sys} EVENTS`;
+      document.getElementById('sum-blade').textContent = `${blade} RUNS`;
+      document.getElementById('avg-water').textContent = `${Number(data.averageWaterLevel || 0).toFixed(1)} CM`;
+      document.getElementById('avg-flow').textContent = `${Number(data.averageFlowRate || 0).toFixed(2)} L/S`;
+      updateCharts(data.wlByWeek || [0, 0, 0, 0], data.blByWeek || [0, 0, 0, 0]);
+    }
+
+    async function loadAnalytics(monthLabel) {
+      try {
+        const query = monthLabel ? `?month=${encodeURIComponent(monthLabel)}` : '';
+        const res = await fetch(`/api/analytics${query}`);
+        if (!res.ok) throw new Error('API unavailable');
+        renderAnalytics(await res.json());
+        document.getElementById('connection-state').classList.remove('offline');
+        document.getElementById('connection-state').innerHTML = '<span class="live-dot"></span> LIVE';
+      } catch (error) {
+        document.getElementById('connection-state').classList.add('offline');
+        document.getElementById('connection-state').innerHTML = '<span class="live-dot"></span> OFFLINE';
+        renderAnalytics({ wlByWeek: [0, 0, 0, 0], blByWeek: [0, 0, 0, 0] });
+      }
+    }
+
+    buildMonthFilters();
+    loadAnalytics();
+  </script>
+</body>
+
+</html>
